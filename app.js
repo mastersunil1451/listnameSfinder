@@ -1,52 +1,42 @@
-// Getting references to DOM elements
-const nameInput = document.getElementById('nameInput');
-const resetBtn = document.getElementById('resetBtn');
-const searchInput = document.getElementById('searchInput');
-const nameList = document.getElementById('nameList');
+// Get the DOM elements
+const nameInput = document.getElementById("nameInput");
+const searchInput = document.getElementById("searchInput");
+const nameList = document.getElementById("nameList");
+const resetButton = document.getElementById("resetButton");
 
-// Store names in an array
+// Initialize an empty array to hold the names
 let names = [];
 
-// Event listener for the input field (Name List)
-nameInput.addEventListener('input', () => {
-    const inputText = nameInput.value.trim();
-    // Split names by newline and filter out any empty names
-    names = inputText.split('\n').map(name => name.trim()).filter(name => name);
-    // Save the list to localStorage
-    localStorage.setItem('names', JSON.stringify(names));
-    updateList(names); // Update the displayed list
+// Event listener for the name input field (to upload the list)
+nameInput.addEventListener("change", (event) => {
+    const uploadedNames = event.target.value.split("\n").map(name => name.trim()).filter(name => name !== "");
+    names = uploadedNames;  // Store the names in the array
+    displayNames(names);  // Display the list
 });
 
-// Event listener for the reset button
-resetBtn.addEventListener('click', () => {
-    localStorage.removeItem('names'); // Clear saved list
-    nameInput.value = ''; // Clear the input field
-    names = [];
-    updateList(names); // Clear displayed list
+// Event listener for the search input field
+searchInput.addEventListener("keyup", (event) => {
+    const query = event.target.value.toLowerCase();
+    const filteredNames = names.filter(name => name.toLowerCase().includes(query));  // Filter names based on the query
+    displayNames(filteredNames);  // Display filtered names
 });
 
-// Event listener for search input (Filter names)
-searchInput.addEventListener('keyup', () => {
-    const query = searchInput.value.toLowerCase();
-    const filteredNames = names.filter(name => name.toLowerCase().includes(query));
-    updateList(filteredNames); // Update the displayed list with filtered names
-});
+// Function to display the list of names
+function displayNames(namesToDisplay) {
+    nameList.innerHTML = '';  // Clear the current displayed list
 
-// Update the displayed name list
-function updateList(namesArray) {
-    nameList.innerHTML = ''; // Clear current list
-    namesArray.forEach(name => {
-        const li = document.createElement('li');
-        li.textContent = name;
-        nameList.appendChild(li);
+    // Create list items for each name and append them
+    namesToDisplay.forEach((name) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = name;
+        nameList.appendChild(listItem);
     });
 }
 
-// Initialize the list from localStorage if available
-window.onload = function() {
-    const savedNames = localStorage.getItem('names');
-    if (savedNames) {
-        names = JSON.parse(savedNames);
-        updateList(names);
-    }
-};
+// Reset functionality (to clear the input and the displayed list)
+resetButton.addEventListener("click", () => {
+    nameInput.value = '';  // Clear the name input
+    searchInput.value = '';  // Clear the search input
+    names = [];  // Clear the stored names
+    nameList.innerHTML = '';  // Clear the displayed list
+});
